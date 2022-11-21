@@ -12,6 +12,8 @@ import com.sys.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +41,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)//清除掉setmealCache所有数据
     public Result<String> save(@RequestBody SetmealDto setmealDto){
         log.info("套餐信息"+setmealDto.toString());
         setmealService.saveWithDish(setmealDto);
@@ -99,6 +102,7 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)//清除掉setmealCache所有数据
     public Result<String> delete(@RequestParam List<Long> ids){
         log.info("id+{}",ids);
         setmealService.removeWithDish(ids);
@@ -111,6 +115,7 @@ public class SetmealController {
      * @return
      */
     @PutMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)//清除掉setmealCache所有数据
     public Result<String> update(@RequestBody SetmealDto setmealDto){
         setmealService.updateWithFlavor(setmealDto);
         return Result.success("修改套餐数据成功");
@@ -134,6 +139,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(value = "setmealCache",allEntries = true)//清除掉setmealCache所有数据
     public Result<String> updateStatus(@PathVariable Integer status,@RequestParam List<Long> ids){
 
         for (Long id: ids) {
@@ -147,6 +153,7 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public Result<List<Setmeal>> list(Setmeal setmeal){
         log.info(setmeal.toString());
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
